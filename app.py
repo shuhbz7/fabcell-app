@@ -12,13 +12,20 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your_secret_key_here")
 
 # Google Sheets setup
+import io  # Make sure you have this imported
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
 
-# Always use local JSON file – remove dependency on env variable
-CREDS = Credentials.from_service_account_file("service-account.json", scopes=SCOPE)
+creds_json = os.environ.get("GOOGLE_CREDS_JSON")
+
+if creds_json:
+    # Use env variable on Railway
+    CREDS = Credentials.from_service_account_info(json.loads(creds_json), scopes=SCOPE)
+else:
+    # Use local JSON file for local dev
+    CREDS = Credentials.from_service_account_file("service-account.json", scopes=SCOPE)
 
 client = gspread.authorize(CREDS)
 spreadsheet = client.open_by_key("14gdbzzP2YnreA7PnYF7RWgjRmkuilAIdHZCnuzUNyaE")
