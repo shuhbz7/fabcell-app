@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profit & Loss Summary - {{ outlet }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+<nav class="main-nav">
+  <a href="{{ url_for('dashboard') }}">Dashboard</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('sales') }}">Sales</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('purchase') }}">Purchase</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('stock') }}">Stock</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('scrap') }}">Scrap</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('expense') }}">Expense</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('profit_loss') }}">Profit & Loss</a>
+  <span class="nav-separator">|</span>
+
+  {% if session.get('username') %}
+    <span>Logged in as {{ session['username'] }}</span>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  {% else %}
+    <a href="{{ url_for('register') }}">Register</a>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('login') }}">Login</a>
+  {% endif %}
+</nav>
+
+<main class="container">
+  <h1>📊 Profit & Loss Summary for Outlet: <em>{{ outlet }}</em></h1>
+
+  <div class="dashboard" style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div class="card">
+      <h2 class="card-title">Total Sales</h2>
+      <p>₹{{ total_sales | round(2) }}</p>
+    </div>
+    <div class="card">
+      <h2 class="card-title">Total Purchase</h2>
+      <p>₹{{ total_purchase | round(2) }}</p>
+    </div>
+    <div class="card">
+      <h2 class="card-title">Gross Profit</h2>
+      <p>₹{{ gross_profit | round(2) }}</p>
+    </div>
+    <div class="card">
+      <h2 class="card-title">Free Replacement Value</h2>
+      <p>₹{{ total_free_replacement | round(2) }}</p>
+    </div>
+    <div class="card">
+      <h2 class="card-title">Total Expense</h2>
+      <p>₹{{ total_expense | round(2) }}</p>
+    </div>
+    <div class="card" style="flex: 1 100%; background: #333; margin-top: 20px;">
+      <h2 class="card-title">Net Profit</h2>
+      <p style="font-size: 1.5rem; font-weight: 700; color: #ffc107;">₹{{ net_profit | round(2) }}</p>
+    </div>
+  </div>
+</main>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<footer class="caption" style="margin-top: 40px; color: #ccc;">
+  <p>⚡ Powering the Future, One Cell at a Time.</p>
+  <p>📦 Trusted Scrap & Stock Management by Fabcell Batteries.</p>
+  <p>🌱 Driving Efficiency & Sustainability Since 2008.</p>
+</footer>
+</body>
+</html>

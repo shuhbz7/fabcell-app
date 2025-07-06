@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scrap Summary</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body><nav class="main-nav">
+  <a href="{{ url_for('dashboard') }}">Dashboard</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('sales') }}">Sales</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('purchase') }}">Purchase</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('stock') }}">Stock</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('scrap') }}">Scrap</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('expense') }}">Expense</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('profit_loss') }}">Profit & Loss</a>
+  <span class="nav-separator">|</span>
+
+  {% if session.get('username') %}
+    <span>Logged in as {{ session['username'] }}</span>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  {% else %}
+    <a href="{{ url_for('register') }}">Register</a>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('login') }}">Login</a>
+  {% endif %}
+</nav>
+
+
+ <main class="container">
+    <h2>Scrap Stock Summary</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Battery</th>
+          <th>Source</th>
+          <th>Quantity</th>
+          <th>Value (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in scrap_list %}
+        <tr>
+          <td>{{ item.battery }}</td>
+          <td>{{ item.source }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>₹{{ "%.2f"|format(item.value) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p><strong>Total Quantity:</strong> {{ total_qty }}</p>
+    <p><strong>Total Scrap Value:</strong> ₹{{ "%.2f"|format(total_value) }}</p>
+  </main>
+</body>
+</html>

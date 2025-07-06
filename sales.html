@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Battery Sales</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+<nav class="main-nav">
+  <a href="{{ url_for('dashboard') }}">Dashboard</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('sales') }}">Sales</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('purchase') }}">Purchase</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('stock') }}">Stock</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('scrap') }}">Scrap</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('expense') }}">Expense</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('profit_loss') }}">Profit & Loss</a>
+  <span class="nav-separator">|</span>
+
+  {% if session.get('username') %}
+    <span>Logged in as {{ session['username'] }}</span>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  {% else %}
+    <a href="{{ url_for('register') }}">Register</a>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('login') }}">Login</a>
+  {% endif %}
+</nav>
+
+<div class="container">
+  <h1>Battery Sales</h1>
+  <form id="salesForm">
+    <!-- Date -->
+    <div class="form-group">
+      <label for="saleDate">Date</label>
+      <input type="date" id="saleDate" required />
+    </div>
+
+    <!-- Sales Type -->
+    <div class="form-group">
+      <label for="salesType">Sales In</label>
+      <select id="salesType" required>
+        <option value="" disabled selected>Select sale type</option>
+        <option value="Dealer">Dealer</option>
+        <option value="Customer">Customer</option>
+        <option value="Garage">Garage</option>
+        <option value="Free Replacement">Free Replacement</option>
+      </select>
+    </div>
+
+    <!-- New Battery -->
+    <div class="form-group">
+      <label for="newBattery">New Battery</label>
+      <!-- Changed from select to input with datalist to allow manual typing -->
+      <input list="batteryList" id="newBattery" name="newBattery" required placeholder="Select or type battery" autocomplete="off" />
+      <datalist id="batteryList">
+        {% for name in battery_prices.keys() | sort %}
+          <option value="{{ name }}"></option>
+        {% endfor %}
+      </datalist>
+    </div>
+
+    <!-- Quantity -->
+    <div class="form-group">
+      <label for="quantity">Quantity</label>
+      <input type="number" id="quantity" min="1" value="1" required />
+    </div>
+
+    <!-- Price Per Unit -->
+    <div class="form-group">
+      <label for="batteryPrice">Price Per Unit (₹)</label>
+      <input type="number" id="batteryPrice" readonly />
+    </div>
+
+    <!-- Old Battery Scrap (hidden for Free Replacement) -->
+    <fieldset id="oldBatteryFieldset">
+      <legend>Old Battery (Scrap)</legend>
+      <table id="oldBatteryTable" border="1" cellspacing="0" cellpadding="5">
+        <thead>
+          <tr><th>Battery</th><th>Quantity</th><th>Remove</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button type="button" id="addOldBatteryBtn">Add Old Battery Scrap</button>
+      <div class="form-group">
+        <label for="oldBatteryTotal">Old Battery Total (₹)</label>
+        <input type="number" id="oldBatteryTotal" readonly />
+      </div>
+    </fieldset>
+
+    <!-- Totals and Discounts -->
+    <div class="form-group">
+      <label for="totalRupees">Total Before Discount ₹</label>
+      <input type="number" id="totalRupees" min="0" step="0.01" required />
+    </div>
+    <div class="form-group">
+      <label for="discount">Discount ₹</label>
+      <input type="number" id="discount" min="0" step="0.01" value="0" />
+    </div>
+    <div class="form-group">
+      <label for="finalAmount">Final Amount ₹</label>
+      <input type="number" id="finalAmount" readonly />
+    </div>
+
+    <button type="submit">Add Sale</button>
+  </form>
+
+  <!-- Sales Summary -->
+  <h2>Sales Summary</h2>
+  <table id="salesTable" border="1" cellpadding="5">
+    <thead><tr>
+      <th>Date</th><th>Type</th><th>New Battery</th><th>Quantity</th>
+      <th>Old Batteries</th><th>Total Old Qty</th>
+      <th>Total (₹)</th><th>Discount (₹)</th><th>Final (₹)</th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+  <p><strong>Total Sales:</strong> <span id="totalSales">₹0.00</span></p>
+</div>
+
+<script>
+  const batteryPrices = {{ battery_prices | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  flatpickr("input[type='date']", {
+    dateFormat: "Y-m-d",
+    defaultDate: "today",
+    allowInput: true
+  });
+</script>
+</body>
+</html>

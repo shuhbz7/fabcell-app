@@ -1,0 +1,197 @@
+/* === Reset & Base Styles === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #111;  /* Dark background */
+    padding: 40px;
+    color: #fff;
+}
+
+/* === Container for purchase form === */
+.container {
+    max-width: 700px;
+    margin: auto;
+    background-color: #000;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+    text-align: left;
+    border: 2px solid #ffc107;
+}
+
+/* === Headings === */
+h2 {
+    margin-bottom: 25px;
+    font-size: 28px;
+    background-color: #ffc107;
+    color: #000;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* === Navigation Bar === */
+.main-nav {
+    background-color: #000;
+    padding: 12px 0;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #ffc107;
+    text-align: center;
+    font-size: 18px;
+}
+
+.main-nav a {
+    color: #ffc107;
+    text-decoration: none;
+    font-weight: 600;
+    margin: 0 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.main-nav a:hover,
+.main-nav a:focus {
+    background-color: #ffc107;
+    color: #000;
+    text-decoration: none;
+}
+
+.nav-separator {
+    color: #ffc107;
+    font-weight: bold;
+    padding: 0 4px;
+    user-select: none;
+}
+
+/* === Form styles === */
+form label {
+    display: block;
+    margin-bottom: 6px;
+    color: #ffc107;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+form input[type="date"],
+form select,
+form input[type="text"],
+form input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background-color: #000;
+    color: #fff;
+    font-size: 16px;
+}
+
+form button[type="button"],
+form button[type="submit"] {
+    background-color: #ffc107;
+    color: #000;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+form button[type="button"]:hover,
+form button[type="submit"]:hover {
+    background-color: #e0a800;
+}
+
+/* === Table styles === */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #444;
+    padding: 10px 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #ffc107;
+    color: #000;
+}
+
+td.total {
+    font-weight: bold;
+}
+
+#customVendorDiv {
+    margin-top: -10px;
+    margin-bottom: 15px;
+}
+
+/* Button inside table (remove row) */
+table button {
+    background-color: #c0392b;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+table button:hover {
+    background-color: #e74c3c;
+}
+
+/* === Custom Category Field for Expense Form === */
+#customCategoryWrapper {
+    display: none;
+    margin-bottom: 15px;
+}
+
+/* === Card Styles === */
+.card {
+    background-color: #222;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #ffc107;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Title section inside cards (yellow background) */
+.card-title {
+    background-color: #ffc107;
+    color: #000; /* Ensure text is black for contrast */
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+}
+
+/* Value/amount text in card */
+.card p {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #fff;
+}
+/* === Dashboard Card Titles === */
+.card-title {
+    background-color: #ffc107;
+    color: #000;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 20px;
+    margin-bottom: 10px;
+}

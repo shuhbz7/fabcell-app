@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock Overview</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<nav class="main-nav">
+  <a href="{{ url_for('dashboard') }}">Dashboard</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('sales') }}">Sales</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('purchase') }}">Purchase</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('stock') }}">Stock</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('scrap') }}">Scrap</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('expense') }}">Expense</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('profit_loss') }}">Profit & Loss</a>
+  <span class="nav-separator">|</span>
+
+  {% if session.get('username') %}
+    <span>Logged in as {{ session['username'] }}</span>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  {% else %}
+    <a href="{{ url_for('register') }}">Register</a>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('login') }}">Login</a>
+  {% endif %}
+</nav>
+
+  <main class="container">
+    <h2>Live Battery Stock</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Battery</th>
+          <th>Outlet</th>
+          <th>Available Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in stock %}
+        <tr>
+          <td>{{ item.battery }}</td>
+          <td>{{ item.outlet }}</td>
+          <td>{{ item.quantity }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

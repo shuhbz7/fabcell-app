@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Battery Bulk Purchase</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+<nav class="main-nav">
+  <a href="{{ url_for('dashboard') }}">Dashboard</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('sales') }}">Sales</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('purchase') }}">Purchase</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('stock') }}">Stock</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('scrap') }}">Scrap</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('expense') }}">Expense</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('profit_loss') }}">Profit & Loss</a>
+  <span class="nav-separator">|</span>
+
+  {% if session.get('username') %}
+    <span>Logged in as {{ session['username'] }}</span>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  {% else %}
+    <a href="{{ url_for('register') }}">Register</a>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('login') }}">Login</a>
+  {% endif %}
+</nav>
+
+  <div class="container">
+    <h2>Battery Bulk Purchase Entry</h2>
+
+    <form id="bulkPurchaseForm">
+      <label for="purchaseDate">Purchase Date:</label>
+      <input type="date" id="purchaseDate" name="purchaseDate" required />
+
+      <label for="purchaseFromOption">Purchase From:</label>
+      <select id="purchaseFromOption" name="purchaseFromOption" required onchange="toggleCustomVendor()">
+        <option value="" disabled selected>Select vendor</option>
+        <option value="Fabcell Batteries">Fabcell Batteries</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <div id="customVendorDiv" style="display:none;">
+        <label for="customVendorInput">Enter Vendor Name:</label>
+        <input type="text" id="customVendorInput" name="customVendorInput" placeholder="Vendor Name" />
+      </div>
+
+      <!-- Purchase Table -->
+      <table id="purchaseTable">
+        <thead>
+          <tr>
+            <th>Battery Type</th>
+            <th>Quantity</th>
+            <th>Unit Price (₹)</th>
+            <th>Total (₹)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="purchaseRows">
+          <!-- Dynamic rows go here -->
+        </tbody>
+      </table>
+
+      <button type="button" onclick="addRow()">➕ Add Battery</button>
+
+      <h3>Grand Total: ₹<span id="grandTotal">0.00</span></h3>
+
+      <button type="submit">✅ Submit Purchase</button>
+    </form>
+  </div>
+
+  <script>
+    // Preload product data from Jinja
+    const priceMap = {};
+    {% for product in products %}
+      priceMap["{{ product.name }}"] = {{ product.price }};
+    {% endfor %}
+
+    function addRow() {
+      const tbody = document.getElementById('purchaseRows');
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+        <td>
+          <input list="batteryList" class="batterySelect" name="batterySelect" required placeholder="Select or type battery" autocomplete="off" />
+          <datalist id="batteryList">
+            {% for product in products %}
+              <option value="{{ product.name }}"></option>
+            {% endfor %}
+          </datalist>
+        </td>
+        <td><input type="number" class="quantity" min="1" value="1" required /></td>
+        <td><input type="number" class="unitPrice" readonly /></td>
+        <td class="rowTotal">₹0.00</td>
+        <td><button type="button" onclick="removeRow(this)">❌</button></td>
+      `;
+
+      tbody.appendChild(row);
+      setupRow(row);
+    }
+
+    function setupRow(row) {
+      const input = row.querySelector('.batterySelect');
+      const qtyInput = row.querySelector('.quantity');
+      const priceInput = row.querySelector('.unitPrice');
+
+      input.addEventListener('input', () => {
+        const val = input.value;
+        const dp = priceMap[val] || 0;
+        priceInput.value = dp;
+        updateRowTotal(row);
+      });
+
+      qtyInput.addEventListener('input', () => updateRowTotal(row));
+    }
+
+    function removeRow(button) {
+      const row = button.closest('tr');
+      row.remove();
+      updateGrandTotal();
+    }
+
+    function updateRowTotal(row) {
+      const qty = parseInt(row.querySelector('.quantity').value) || 0;
+      const price = parseFloat(row.querySelector('.unitPrice').value) || 0;
+      const total = qty * price;
+      row.querySelector('.rowTotal').textContent = `₹${total.toFixed(2)}`;
+      updateGrandTotal();
+    }
+
+    function updateGrandTotal() {
+      let grand = 0;
+      document.querySelectorAll('#purchaseRows tr').forEach(row => {
+        const qty = parseInt(row.querySelector('.quantity').value) || 0;
+        const price = parseFloat(row.querySelector('.unitPrice').value) || 0;
+        grand += qty * price;
+      });
+      document.getElementById('grandTotal').textContent = grand.toFixed(2);
+    }
+
+    function toggleCustomVendor() {
+      const vendorSelect = document.getElementById("purchaseFromOption");
+      const customDiv = document.getElementById("customVendorDiv");
+      const customInput = document.getElementById("customVendorInput");
+      if (vendorSelect.value === "Other") {
+        customDiv.style.display = "block";
+        customInput.required = true;
+      } else {
+        customDiv.style.display = "none";
+        customInput.required = false;
+        customInput.value = "";
+      }
+    }
+
+    document.getElementById('bulkPurchaseForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const rows = document.querySelectorAll('#purchaseRows tr');
+      const purchaseDate = document.getElementById('purchaseDate').value;
+      const vendor = document.getElementById('purchaseFromOption').value === 'Other'
+        ? document.getElementById('customVendorInput').value.trim()
+        : document.getElementById('purchaseFromOption').value;
+
+      const items = [];
+      rows.forEach(row => {
+        const batteryType = row.querySelector('.batterySelect').value;
+        const quantity = parseInt(row.querySelector('.quantity').value);
+        const unitPrice = parseFloat(row.querySelector('.unitPrice').value);
+        if (batteryType && quantity && unitPrice >= 0) {
+          items.push({
+            batteryType,
+            quantity,
+            unitPrice,
+            total: quantity * unitPrice
+          });
+        }
+      });
+
+      const grandTotal = parseFloat(document.getElementById('grandTotal').textContent);
+
+      fetch("/api/save_bulk_purchase", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          purchaseDate,
+          vendor,
+          items,
+          grandTotal
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || "Purchase submitted!");
+          location.reload();
+        })
+        .catch(err => {
+          console.error("Save error:", err);
+          alert("An error occurred while saving.");
+        });
+    });
+
+    // Initial load
+    window.onload = () => addRow();
+  </script>
+
+  <!-- Added Flatpickr JS library -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    flatpickr("input[type='date']", {
+      dateFormat: "Y-m-d",
+      defaultDate: "today",
+      allowInput: true
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fabcell Inventory</title>
+
+  <!-- Fonts and Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+  <!-- PWA: Manifest and Theme -->
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <meta name="theme-color" content="#1e1e1e" />
+  <link rel="icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}" type="image/png">
+
+  <style>
+    .profit-positive { color: #28a745; font-weight: bold; }
+    .profit-negative { color: #dc3545; font-weight: bold; }
+  </style>
+</head>
+<body>
+<nav class="main-nav">
+  <a href="{{ url_for('dashboard') }}">Dashboard</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('sales') }}">Sales</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('purchase') }}">Purchase</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('stock') }}">Stock</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('scrap') }}">Scrap</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('expense') }}">Expense</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('profit_loss') }}">Profit & Loss</a>
+  <span class="nav-separator">|</span>
+
+  {% if session.get('username') %}
+    <span>Logged in as {{ session['username'] }}</span>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  {% else %}
+    <a href="{{ url_for('register') }}">Register</a>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('login') }}">Login</a>
+  {% endif %}
+</nav>
+
+<main class="container">
+  <h1 style="color: white;">Battery Inventory Dashboard</h1>
+  <div class="dashboard" style="display: flex; justify-content: center; margin-top: 40px;">
+    <div class="card" style="background: #333;">
+      <h2 class="card-title">Net Profit</h2>
+      <p id="netProfit" class="profit-positive">₹0.00</p>
+    </div>
+  </div>
+</main>
+
+<footer class="caption">
+  <p>⚡ Powering the Future, One Cell at a Time.</p>
+  <p>📦 Trusted Scrap & Stock Management by Fabcell Batteries.</p>
+  <p>🌱 Driving Efficiency & Sustainability Since 2008.</p>
+</footer>
+
+<script>
+  async function loadNetProfit() {
+    try {
+      const response = await fetch('/api/summary');
+      const data = await response.json();
+      const net = parseFloat(data.net);
+      const netProfitEl = document.getElementById("netProfit");
+      netProfitEl.textContent = `₹${net.toFixed(2)}`;
+      netProfitEl.className = net >= 0 ? "profit-positive" : "profit-negative";
+    } catch (err) {
+      console.error("Error loading Net Profit:", err);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", loadNetProfit);
+
+  // Register Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register("/static/service-worker.js")
+      .then(reg => console.log("Service Worker registered:", reg))
+      .catch(err => console.error("Service Worker registration failed:", err));
+  }
+</script>
+</body>
+</html>

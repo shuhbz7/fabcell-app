@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Log Expense</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+
+  <style>
+    /* Flash message styles */
+    .flash-messages {
+      margin-bottom: 1em;
+    }
+    .flash {
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .flash.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .flash.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
+</head>
+<body>
+   <nav class="main-nav">
+  <a href="{{ url_for('dashboard') }}">Dashboard</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('sales') }}">Sales</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('purchase') }}">Purchase</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('stock') }}">Stock</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('scrap') }}">Scrap</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('expense') }}">Expense</a>
+  <span class="nav-separator">|</span>
+  <a href="{{ url_for('profit_loss') }}">Profit & Loss</a>
+  <span class="nav-separator">|</span>
+
+  {% if session.get('username') %}
+    <span>Logged in as {{ session['username'] }}</span>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  {% else %}
+    <a href="{{ url_for('register') }}">Register</a>
+    <span class="nav-separator">|</span>
+    <a href="{{ url_for('login') }}">Login</a>
+  {% endif %}
+</nav>
+
+  <main class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <h2>Log New Expense</h2>
+    <form method="POST" action="/expense" id="expenseForm">
+      <label for="date">Date</label>
+      <input type="date" id="date" name="date" required />
+
+      <label for="category">Category</label>
+      <select id="category" name="category" required>
+        <option value="">--Select--</option>
+        <option value="Rent">Rent</option>
+        <option value="Labour">Labour</option>
+        <option value="Transportation">Transportation</option>
+        <option value="Electricity">Electricity</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <div id="customCategoryWrapper" style="display:none;">
+        <label for="customCategory">Specify Other Category</label>
+        <input
+          type="text"
+          id="customCategory"
+          name="customCategory"
+          placeholder="e.g. Generator maintenance"
+        />
+      </div>
+
+      <label for="description">Description</label>
+      <input
+        type="text"
+        id="description"
+        name="description"
+        placeholder="e.g. Shop rent for June"
+        required
+      />
+
+      <label for="amount">Amount (₹)</label>
+      <input
+        type="number"
+        id="amount"
+        name="amount"
+        placeholder="e.g. 15000"
+        step="0.01"
+        required
+      />
+
+      <!-- Hidden input to send final category -->
+      <input type="hidden" id="finalCategory" name="finalCategory" />
+
+      <button type="submit">Save Expense</button>
+    </form>
+  </main>
+
+  <footer class="caption">
+    <p>⚡ Powering the Future, One Cell at a Time.</p>
+    <p>📦 Trusted Scrap & Stock Management by Fabcell Batteries.</p>
+    <p>🌱 Driving Efficiency & Sustainability Since 2008.</p>
+  </footer>
+
+  <script>
+    const categorySelect = document.getElementById('category');
+    const customCategoryWrapper = document.getElementById('customCategoryWrapper');
+    const customCategoryInput = document.getElementById('customCategory');
+    const finalCategoryInput = document.getElementById('finalCategory');
+
+    categorySelect.addEventListener('change', function () {
+      if (this.value === 'Other') {
+        customCategoryWrapper.style.display = 'block';
+        customCategoryInput.setAttribute('required', 'required');
+      } else {
+        customCategoryWrapper.style.display = 'none';
+        customCategoryInput.removeAttribute('required');
+      }
+    });
+
+    document.getElementById('expenseForm').addEventListener('submit', function (e) {
+      if (categorySelect.value === 'Other') {
+        if (customCategoryInput.value.trim() === '') {
+          e.preventDefault();
+          alert('Please specify the custom category.');
+          return;
+        }
+        finalCategoryInput.value = customCategoryInput.value.trim();
+      } else {
+        finalCategoryInput.value = categorySelect.value;
+      }
+    });
+
+    // Auto-refresh page 3 seconds after a successful flash message
+    window.addEventListener('DOMContentLoaded', () => {
+      const successFlash = document.querySelector('.flash.success');
+      if (successFlash) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000); // 3 seconds
+      }
+    });
+  </script>
+
+  <!-- Added Flatpickr JS library -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    flatpickr("input[type='date']", {
+      dateFormat: "Y-m-d",
+      defaultDate: "today",
+      allowInput: true
+    });
+  </script>
+</body>
+</html>
